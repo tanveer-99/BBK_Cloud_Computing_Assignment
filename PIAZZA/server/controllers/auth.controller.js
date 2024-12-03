@@ -1,9 +1,9 @@
 import bcryptjs from 'bcryptjs'
 import User from '../models/user.model.js'
+import jwt from 'jsonwebtoken'
 
 export const signUp = async (req, res)=> {
-    const {username, email, password} = req.body
-
+    const { username, email, password } = req.body
     // use bcryptjs to hash the user password with a salt
     const salt = bcryptjs.genSaltSync(10)
     const hashedpassword = bcryptjs.hashSync(password, salt)
@@ -19,7 +19,7 @@ export const signUp = async (req, res)=> {
         const user = await newUser.save()
         res.status(200).send(user)
     } catch (error) {
-        res.send(error)
+        res.send(error.message)
     }
 }
 
@@ -39,7 +39,11 @@ export const signIn = async (req, res)=> {
             return res.status(404).send("Invalid Credentials.")
         }
         // create a JWT token and store it in the cookie
-
+        const token = jwt.sign({id: validUser._id}, process.env.JWT_TOKEN)
+        // send user information without password
+        const { password: pass, ...rest } = validUser._doc
+        // store the access_token in the cookie
+        res.status(200).cookie('access_token', token, {httpOnly: true}).json(rest)
     } catch (error) {
         
     }
