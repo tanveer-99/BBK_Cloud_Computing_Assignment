@@ -43,7 +43,7 @@ export const signIn = async (req, res)=> {
         // send user information without password
         const { password: pass, ...rest } = validUser._doc
         // store the access_token in the cookie
-        res.status(200).cookie('access_token', token, {httpOnly: true}).json(rest)
+        res.status(200).cookie('access_token', token, {httpOnly: true}).json("Sign in Successful")
     } catch (error) {
         
     }
