@@ -1,5 +1,19 @@
 import mongoose from "mongoose";
 
+
+// // Define the comment schema
+// const commentSchema = new Schema({
+//     commenterName: { 
+//         type: String, 
+//         required: true 
+//     },
+//     commentText: { 
+//         type: String, 
+//         required: true 
+//     },
+// });
+// comments: { type: [commentSchema], default: [] }, // List of comments
+
 const postSchema = new mongoose.Schema(
     {
         title: {
@@ -34,6 +48,18 @@ const postSchema = new mongoose.Schema(
                 required: true
             }
         },
+        comments: [
+            {
+                commenterUsername: {
+                    type: String,
+                    required: true
+                },
+                commentText: {
+                    type: String,
+                    required: true
+                }
+            }
+        ],        
         likes: { 
             type: Number, 
             default: 0 
