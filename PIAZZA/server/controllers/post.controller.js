@@ -23,12 +23,37 @@ export const uploadPosts = async (req,res)=> {
     } catch (error) {
         res.send(error.message)
     }
-    
-
 }
 
-export const getAllPosts = async ()=> {
 
+
+export const getAllPosts = async (req, res)=> {
+    try {
+        const allPosts = await Post.find()
+        res.status(200).send(allPosts)
+    } catch (error) {
+        res.send(error.message)
+    }
+}
+
+
+
+export const getPostsPerTopic = async (req, res)=> {
+    const {topic} = req.query
+    //if query parameter is not written
+    if(!topic) {
+        return res.status(400).send("Topic query parameter is required.")
+    }
+    try {
+        const postsPerTopic = await Post.find({topic})
+        //if no posts found or query value not written correctly
+        if (postsPerTopic.length === 0) {
+            return res.status(404).json(`No posts found for topic: ${topic}`);
+        }
+        res.status(200).send(postsPerTopic)
+    } catch (error) {
+        res.send(error.message)
+    }
 }
 
 
