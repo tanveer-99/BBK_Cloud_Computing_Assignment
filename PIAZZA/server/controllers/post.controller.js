@@ -13,7 +13,7 @@ export const uploadPosts = async (req,res)=> {
         expirationTime: new Date(Date.now() +  expirationTime*60*1000), // 2 min from now
         owner: { 
             name: user.username, 
-            email: user.email 
+            email: user.email  
         },
     });
     //save the post in the database
