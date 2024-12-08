@@ -4,6 +4,7 @@ import { verifyToken } from "../utilities/verifyToken.js";
 
 const router = Router()
 
+//check if a valid user with verifyToken, before going to do any action
 router.post('/',verifyToken, uploadPosts)
 router.get('/', verifyToken, getAllPosts)
 router.get('/posts', verifyToken, getPostsPerTopic)

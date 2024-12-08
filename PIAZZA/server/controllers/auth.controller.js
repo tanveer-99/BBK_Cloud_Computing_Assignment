@@ -2,6 +2,7 @@ import bcryptjs from 'bcryptjs'
 import User from '../models/user.model.js'
 import jwt from 'jsonwebtoken'
 
+//signup api functionalities
 export const signUp = async (req, res)=> {
     const { username, email, password } = req.body
     // use bcryptjs to hash the user password with a salt
@@ -19,11 +20,11 @@ export const signUp = async (req, res)=> {
         const user = await newUser.save()
         res.status(200).send(user)
     } catch (error) {
-        res.send(error.message)
+        res.status(400).send(error.message)
     }
 }
 
-
+//sign in api functionalities
 export const signIn = async (req, res)=> {
     const {email, password} = req.body
 
@@ -45,7 +46,7 @@ export const signIn = async (req, res)=> {
         // store the access_token in the cookie
         res.status(200).cookie('access_token', token, {httpOnly: true}).json("Sign in Successful")
     } catch (error) {
-        
+        res.status(400).send(error.message)
     }
 }
 

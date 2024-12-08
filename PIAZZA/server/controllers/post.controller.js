@@ -1,23 +1,25 @@
 import Post from "../models/post.model.js"
 import User from "../models/user.model.js"
 
+
+// Upload a new post api functionalities
 export const uploadPosts = async (req,res)=> {
     const {title, topic, messageBody, expirationTime } = req.body
-    //retrieve the user email and username with req.user.id, getting from verifyToken
-    const user = await User.findOne({_id: req.user.id})
-    //create a new post with the Post model
-    const newPost = new Post({
-        title,
-        topic,
-        messageBody,
-        expirationTime: new Date(Date.now() +  expirationTime*60*1000), // 2 min from now
-        owner: { 
-            name: user.username, 
-            email: user.email  
-        },
-    });
-    //save the post in the database
     try {
+        //retrieve the user email and username with req.user.id, getting from verifyToken
+        const user = await User.findOne({_id: req.user.id})
+        //create a new post with the Post model
+        const newPost = new Post({
+            title,
+            topic,
+            messageBody,
+            expirationTime: new Date(Date.now() +  expirationTime*60*1000), // 2 min from now
+            owner: { 
+                name: user.username, 
+                email: user.email  
+            },
+        });
+        //save the post in the database
         const post = await newPost.save()
         res.status(200).send(post)
     } catch (error) {
@@ -26,7 +28,7 @@ export const uploadPosts = async (req,res)=> {
 }
 
 
-
+// get all posts api functionalities
 export const getAllPosts = async (req, res)=> {
     try {
         const allPosts = await Post.find()
@@ -37,10 +39,10 @@ export const getAllPosts = async (req, res)=> {
 }
 
 
-
+//get posts by topic api functionalities
 export const getPostsPerTopic = async (req, res)=> {
     const {topic} = req.query
-    //if query parameter is not written
+    //if query parameter is not given
     if(!topic) {
         return res.status(400).send("Topic query parameter is required.")
     }
@@ -57,39 +59,35 @@ export const getPostsPerTopic = async (req, res)=> {
 }
 
 
-
+// like and dislike update api functionlities
 export const updateLikeDislike = async (req, res)=> {
     const action = req.query.action
     const postId = req.params.postId
-    //retrieve the user email with req.user.id, getting from verifyToken
-    const user = await User.findOne({_id: req.user.id})
-    //find the post to be updated
-    const updatingPost = await Post.findOne({_id:postId})
-    //check if the user himself wants to like or dislike his own post
-    if(user.email === updatingPost.owner.email) {
-        return res.status(400).send("You cannot like or dislike your own post")
-    }
-    //check the expired status of the post
-    if(updatingPost.status === "Expired") {
-        return res.status(400).send("You cannot like/dislike an expired post.")
-    }
-    // if query===like, update the number of likes of the post
-    if(action==="like") {
-        try {
+    try {
+        //retrieve the user email with req.user.id, getting from verifyToken
+        const user = await User.findOne({_id: req.user.id})
+        //find the post to be updated
+        const updatingPost = await Post.findOne({_id:postId})
+        //check if the user himself wants to like or dislike his own post
+        if(user.email === updatingPost.owner.email) {
+            return res.status(400).send("You cannot like or dislike your own post")
+        }
+        //check the expired status of the post
+        if(updatingPost.status === "Expired") {
+            return res.status(400).send("You cannot like/dislike an expired post.")
+        }
+        // if query===like, update the number of likes of the post
+        if(action==="like") {
             const updatedPost = await Post.findByIdAndUpdate(postId, 
                 { $inc: { 
                     likes: 1 
                 } 
             }, 
             { new: true })
-            res.status(200).send(updatedPost)
-        } catch (error) {
-            res.send(error.message)
+            res.status(200).send(updatedPost)   
         }
-    }
-    // if query===dislike, update the number of dislikes of the post
-    if(action==="dislike") {
-        try {
+        // if query===dislike, update the number of dislikes of the post
+        if(action==="dislike") {
             const updatedPost = await Post.findByIdAndUpdate(postId, 
                 { $inc: { 
                     dislikes: 1 
@@ -97,13 +95,14 @@ export const updateLikeDislike = async (req, res)=> {
             }, 
             { new: true })
             res.status(200).send(updatedPost)
-        } catch (error) {
-            res.send(error.message)
         }
+    } catch (error) {
+        res.status(400).send(error.message)
     }
 }
 
 
+// put a comment on a post api functionalities
 export const updateComment = async (req, res) => {
     const postId = req.params.postId
     const {commentBody} = req.body
@@ -140,6 +139,7 @@ export const updateComment = async (req, res) => {
 }
 
 
+// get all the expired post api
 export const getExpiredPosts = async(req, res) => {
     const query = req.query.topic
     try {
@@ -153,29 +153,31 @@ export const getExpiredPosts = async(req, res) => {
     }
 }
 
+
+// get the post with the most likes and dislikes api
 export const getMostActivePostPerTopic = async (req, res) => {
     const { topic } = req.query;
     if(!topic) {
         return res.status(400).send("A topic is required.")
     }
     try {
-        const matchStage = { $match: { topic: topic } } // Filter by specific topic 
-            
-
+        // Filter by specific topic
+        const matchStage = { $match: { topic: topic } }  
+        // Filter posts
         const result = await Post.aggregate([
-            matchStage, // Filter posts
+            matchStage, 
             {
                 $addFields: {
-                    engagement: { $add: ['$likes', '$dislikes'] }, // Calculate engagement
+                    engagement: { $add: ['$likes', '$dislikes'] }, 
                 },
             },
             {
-                $sort: { engagement: -1 }, // Sort by engagement in descending order
+                $sort: { engagement: -1 }, 
             },
             {
                 $group: {
-                    _id: topic ? topic : '$topic', // Group by topic or return all topics
-                    mostActivePost: { $first: '$$ROOT' }, // Select the most active post
+                    _id: topic ? topic : '$topic', // 
+                    mostActivePost: { $first: '$$ROOT' },
                 },
             },
         ]);

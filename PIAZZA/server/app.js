@@ -1,3 +1,4 @@
+//used ES module rather than commonjs module
 import express from 'express'
 import mongoose from 'mongoose'
 import dotenv from 'dotenv'
@@ -13,6 +14,7 @@ const PORT = process.env.PORT
 //middleware to parse JSON
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
+//middleware for cookies
 app.use(cookieParser())
 
 // connect to mongoDB with mongoose
