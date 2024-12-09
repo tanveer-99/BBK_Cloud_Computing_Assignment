@@ -1,8 +1,8 @@
 import cron from "node-cron";
 import Post from "../models/post.model.js";
 
-// Schedule a job to run every 6 hours
-cron.schedule("0 */6 * * *", async () => {
+// Schedule a job to run every 5 mintues
+cron.schedule("*/1 * * * *", async () => {
     try {
         const currentDate = new Date();
 

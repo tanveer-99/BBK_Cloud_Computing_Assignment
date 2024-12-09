@@ -130,7 +130,7 @@ export const updateComment = async (req, res) => {
         updatingPost.comments.push(newComment);
         // Save the updated post
         await updatingPost.save();
-        res.status(200).send("comment added successfully")
+        res.status(200).send(updatingPost)
         
     } catch (error) {
         res.send(error.message)

@@ -30,7 +30,7 @@ mongoose.connect(process.env.MONGO)
 import authRouter from './routes/auth.route.js'
 import postRouter from './routes/post.route.js'
 app.use('/api/auth', authRouter)
-app.use('/api/post', postRouter)
+app.use('/api/post', postRouter)    
 
 
 
